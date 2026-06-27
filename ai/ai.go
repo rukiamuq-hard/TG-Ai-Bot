@@ -37,14 +37,13 @@ func init() {
 	}
 }
 
-func SendMessageToClaude(text string) (string, error) {
+func SendMessageToGemini(text string) (string, error) {
 	apiKey := os.Getenv("AI_TOKEN")
-	fmt.Println(apiKey)
 	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=%s", apiKey)
-
 	prompt, err := os.ReadFile("prompt.txt")
 	if err != nil {
-		log.Println("Can`t read file, use gemini without prompt!: ", err)
+		log.Println("Default working, withiout pormpt")
+		log.Println(err)
 	}
 	body, _ := json.Marshal(request{
 		Contents: []content{
@@ -54,16 +53,11 @@ func SendMessageToClaude(text string) (string, error) {
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
 	if err != nil {
+		log.Println(err)
 		return "", err
 	}
 	defer resp.Body.Close()
 	var result response
-
 	json.NewDecoder(resp.Body).Decode(&result)
-
-	fmt.Println("статус:", resp.Status)
-	fmt.Println("кандидатов:", len(result.Candidates))
-
 	return result.Candidates[0].Content.Parts[0].Text, nil
-
 }

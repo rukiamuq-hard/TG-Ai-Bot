@@ -5,6 +5,8 @@ import (
 	tele "gopkg.in/telebot.v4"
 	"log"
 	"main.go/ai"
+	"main.go/dataBase"
+	_ "modernc.org/sqlite"
 	"os"
 	"time"
 )
@@ -29,21 +31,30 @@ func main() {
 		return
 	}
 
-	b.Handle("/Claude", func(c tele.Context) error {
+	storage, err := database.CreateStartDB()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer database.CloseDB(storage)
+
+	b.Handle("/Gemini", func(c tele.Context) error {
 		tags := c.Args()
 		if tags == nil {
-			return c.Reply(c.Send("Wrong format\nUse: /command <prompt>\n"))
+			return c.Reply("Wrong format\nUse: /Gemini <prompt>\n")
 		}
-		s, sep := "", " "
-		for _, tag := range tags {
-			s += tag + sep
 
+		var s string
+		for _, tag := range tags {
+			s += tag + " "
 		}
-		response, err := ai.SendMessageToClaude(s)
+		resp := database.ReadFromDB(storage, c.Sender().ID)
+
+		response, err := ai.SendMessageToGemini(resp + "Вопрос: " + s)
 		if err != nil {
-			return c.Reply(c.Send(err))
+			return c.Reply(err)
 		}
-		return c.Reply(c.Send(response))
+		database.InsertToDB(storage, c.Sender().ID, s)
+		return c.Reply(response)
 	})
 	//This for logs of the chat
 	/*
