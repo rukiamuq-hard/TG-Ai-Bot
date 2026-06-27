@@ -45,7 +45,7 @@ func main() {
 		}
 		return c.Reply(c.Send(response))
 	})
-
+	//This for logs of the chat
 	/*
 		b.Handle(tele.OnText, func(c tele.Context) error {
 			sender := c.Sender()
