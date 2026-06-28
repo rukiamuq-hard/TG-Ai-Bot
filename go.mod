@@ -1,4 +1,4 @@
-module main.go
+module TgAiBot
 
 go 1.26.3
 

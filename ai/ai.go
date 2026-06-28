@@ -37,17 +37,12 @@ func init() {
 	}
 }
 
-func SendMessageToGemini(text string) (string, error) {
+func GeminiGetResponse(text string) (string, error) {
 	apiKey := os.Getenv("AI_TOKEN")
 	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=%s", apiKey)
-	prompt, err := os.ReadFile("prompt.txt")
-	if err != nil {
-		log.Println("Default working, withiout pormpt")
-		log.Println(err)
-	}
 	body, _ := json.Marshal(request{
 		Contents: []content{
-			{Parts: []part{{Text: string(prompt) + text}}},
+			{Parts: []part{{Text: text}}},
 		},
 	})
 
@@ -57,7 +52,9 @@ func SendMessageToGemini(text string) (string, error) {
 		return "", err
 	}
 	defer resp.Body.Close()
+
 	var result response
 	json.NewDecoder(resp.Body).Decode(&result)
+
 	return result.Candidates[0].Content.Parts[0].Text, nil
 }
