@@ -1,14 +1,16 @@
 package main
 
 import (
+	"log"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/joho/godotenv"
 	tele "gopkg.in/telebot.v4"
-	"log"
 	"main.go/ai"
 	"main.go/dataBase"
 	_ "modernc.org/sqlite"
-	"os"
-	"time"
 )
 
 func init() {
@@ -22,7 +24,7 @@ func main() {
 
 	pref := tele.Settings{
 		Token:  token,
-		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
+		Poller: &tele.LongPoller{Timeout: 5 * time.Second},
 	}
 
 	b, err := tele.NewBot(pref)
@@ -38,22 +40,18 @@ func main() {
 	defer database.CloseDB(storage)
 
 	b.Handle("/Gemini", func(c tele.Context) error {
-		tags := c.Args()
-		if tags == nil {
+		if c.Args() == nil {
 			return c.Reply("Wrong format\nUse: /Gemini <prompt>\n")
 		}
 
-		var s string
-		for _, tag := range tags {
-			s += tag + " "
-		}
-		resp := database.ReadFromDB(storage, c.Sender().ID)
+		s := strings.Join(c.Args(), " ")
 
-		response, err := ai.SendMessageToGemini(resp + "Вопрос: " + s)
+		resp := database.ReadFromDB(storage, c.Sender().ID)
+		response, err := ai.SendMessageToGemini("[HISTORY]: " + resp + "[QUESTION]: " + s)
 		if err != nil {
 			return c.Reply(err)
 		}
-		database.InsertToDB(storage, c.Sender().ID, s)
+		go database.InsertToDB(storage, c.Sender().ID, s)
 		return c.Reply(response)
 	})
 	//This for logs of the chat

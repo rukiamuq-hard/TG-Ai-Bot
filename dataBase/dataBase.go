@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 
 	_ "modernc.org/sqlite"
 )
@@ -51,22 +52,21 @@ func ReadFromDB(stor *Storage, user_id int64) string {
 		log.Fatal(err)
 	}
 
-	var s string
-
+	var s strings.Builder
 	for rows.Next() {
 		var r string
 		err := rows.Scan(&r)
 		if err != nil {
 			log.Fatal(err)
 		}
-		s += r + " "
+		s.WriteString(r + " ")
 	}
 
 	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(s)
-	return s
+	fmt.Println("ID: ", user_id, "\n", "TEXT: ", s.String())
+	return s.String()
 }
 
 func CloseDB(stor *Storage) {
