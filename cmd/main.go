@@ -6,10 +6,11 @@ import (
 	"strings"
 	"time"
 
+	"TgAiBot/ai"
+	"TgAiBot/dataBase/context"
+
 	"github.com/joho/godotenv"
 	tele "gopkg.in/telebot.v4"
-	"main.go/ai"
-	"main.go/dataBase"
 	_ "modernc.org/sqlite"
 )
 
@@ -33,11 +34,17 @@ func main() {
 		return
 	}
 
-	storage, err := database.CreateStartDB()
+	prompt, err := os.ReadFile("prompt.txt")
+	if err != nil {
+		log.Println("Default working, without prompt")
+		log.Println(err)
+	}
+
+	DB, err := dataBaseContext.CreateStartDB()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer database.CloseDB(storage)
+	defer dataBaseContext.CloseDB(DB)
 
 	b.Handle("/Gemini", func(c tele.Context) error {
 		if c.Args() == nil {
@@ -46,21 +53,28 @@ func main() {
 
 		s := strings.Join(c.Args(), " ")
 
-		resp := database.ReadFromDB(storage, c.Sender().ID)
-		response, err := ai.SendMessageToGemini("[HISTORY]: " + resp + "[QUESTION]: " + s)
+		resp := dataBaseContext.ReadFromContextDB(DB, c.Sender().ID)
+		response, err := ai.GeminiGetResponse("[PROMPT]: " + string(prompt) + "[HISTORY]: " + resp + "[QUESTION]: " + s)
 		if err != nil {
 			return c.Reply(err)
 		}
-		go database.InsertToDB(storage, c.Sender().ID, s)
+
+		go dataBaseContext.StoreToContextDB(DB, c.Sender().ID, s)
 		return c.Reply(response)
 	})
-	//This for logs of the chat
-	/*
-		b.Handle(tele.OnText, func(c tele.Context) error {
-			sender := c.Sender()
-			fmt.Println("Sender: ", sender, "\nText: ", c.Text())
-			return nil
-		})
-	*/
+
+	b.Handle(tele.OnText, func(c tele.Context) error {
+		go dataBaseContext.StoreToChatLogDB(DB, c.Sender().FirstName+" "+c.Sender().LastName, c.Text())
+		return nil
+	})
+
+	b.Handle("/ChatLogs", func(c tele.Context) error {
+		str := dataBaseContext.ReadFromChatLogDB(DB)
+		response, err := ai.GeminiGetResponse("(Всё что в скобках-системный промпт, твоя цель проанализировать текст который будет после и отправить краткий отчёт без форматирования текста): " + str)
+		if err != nil {
+			return c.Reply(err)
+		}
+		return c.Reply(response)
+	})
 	b.Start()
 }
