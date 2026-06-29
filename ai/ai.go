@@ -3,6 +3,7 @@ package ai
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -40,11 +41,14 @@ func init() {
 func GeminiGetResponse(text string) (string, error) {
 	apiKey := os.Getenv("AI_TOKEN")
 	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=%s", apiKey)
-	body, _ := json.Marshal(request{
+	body, err := json.Marshal(request{
 		Contents: []content{
 			{Parts: []part{{Text: text}}},
 		},
 	})
+	if err != nil {
+		return "", err
+	}
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
 	if err != nil {
@@ -56,5 +60,8 @@ func GeminiGetResponse(text string) (string, error) {
 	var result response
 	json.NewDecoder(resp.Body).Decode(&result)
 
+	if len(result.Candidates) == 0 {
+		return "", errors.New("Empty Gemini reponse!")
+	}
 	return result.Candidates[0].Content.Parts[0].Text, nil
 }

@@ -1,13 +1,14 @@
 package main
 
 import (
-	"log"
-	"os"
-	"strings"
-	"time"
-
 	"TgAiBot/ai"
 	"TgAiBot/dataBase/context"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+	"unicode"
 
 	"github.com/joho/godotenv"
 	tele "gopkg.in/telebot.v4"
@@ -53,7 +54,12 @@ func main() {
 
 		s := strings.Join(c.Args(), " ")
 
-		resp := dataBaseContext.ReadFromContextDB(DB, c.Sender().ID)
+		resp, err := dataBaseContext.ReadFromContextDB(DB, c.Sender().ID)
+		if err != nil {
+			log.Fatal(err)
+			return c.Reply(err)
+		}
+
 		response, err := ai.GeminiGetResponse("[PROMPT]: " + string(prompt) + "[HISTORY]: " + resp + "[QUESTION]: " + s)
 		if err != nil {
 			return c.Reply(err)
@@ -69,12 +75,28 @@ func main() {
 	})
 
 	b.Handle("/ChatLogs", func(c tele.Context) error {
-		str := dataBaseContext.ReadFromChatLogDB(DB)
-		response, err := ai.GeminiGetResponse("(Всё что в скобках-системный промпт, твоя цель проанализировать текст который будет после и отправить краткий отчёт без форматирования текста): " + str)
+
+		for _, s := range c.Message().Payload {
+			if unicode.IsLetter(s) || unicode.IsSymbol(s) {
+				return c.Reply("Wrong format. Use numbers")
+			}
+		}
+
+		val, _ := strconv.ParseInt(c.Message().Payload, 10, 64)
+		if val == 0 {
+			val = 200
+		}
+
+		str, err := dataBaseContext.ReadFromChatLogDB(DB, val)
 		if err != nil {
+			log.Fatal(err)
+		}
+		response, err := ai.GeminiGetResponse("(Всё что в скобках-системный промпт, твоя цель пересказать коротко что произошло в этих сообщениях, от самых левых, тоесть новых, к старым справа): " + str)
+		if err != nil {
+			log.Fatal(err)
 			return c.Reply(err)
 		}
-		return c.Reply(response)
+		return c.Reply(response + " " + c.Message().Payload)
 	})
 	b.Start()
 }
