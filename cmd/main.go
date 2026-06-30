@@ -60,17 +60,24 @@ func main() {
 			return c.Reply(err)
 		}
 
-		response, err := ai.GeminiGetResponse("[PROMPT]: " + string(prompt) + "[HISTORY]: " + resp + "[QUESTION]: " + s)
+		response, err := ai.GeminiGetResponse(resp, "[PROMPT]: "+string(prompt)+"[QUESTION]: "+s)
 		if err != nil {
 			return c.Reply(err)
 		}
 
-		go dataBaseContext.StoreToContextDB(DB, c.Sender().ID, s)
+		err = dataBaseContext.StoreToContextDB(DB, c.Sender().ID, "user", s)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = dataBaseContext.StoreToContextDB(DB, c.Sender().ID, "model", response)
+		if err != nil {
+			log.Fatal(err)
+		}
 		return c.Reply(response)
 	})
 
 	b.Handle(tele.OnText, func(c tele.Context) error {
-		go dataBaseContext.StoreToChatLogDB(DB, c.Sender().FirstName+" "+c.Sender().LastName, c.Text())
+		dataBaseContext.StoreToChatLogDB(DB, c.Sender().FirstName+" "+c.Sender().LastName, c.Text())
 		return nil
 	})
 
@@ -91,7 +98,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		response, err := ai.GeminiGetResponse("(Всё что в скобках-системный промпт, твоя цель пересказать коротко что произошло в этих сообщениях, от самых левых, тоесть новых, к старым справа): " + str)
+		response, err := ai.GeminiGetResponseNoHistory("(Всё что в скобках-системный промпт, твоя цель пересказать коротко что произошло в этих сообщениях, от самых левых, тоесть новых, к старым справа): " + str)
 		if err != nil {
 			log.Fatal(err)
 			return c.Reply(err)

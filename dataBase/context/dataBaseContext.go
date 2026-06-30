@@ -1,6 +1,7 @@
 package dataBaseContext
 
 import (
+	"TgAiBot/ai"
 	"database/sql"
 	"fmt"
 	_ "modernc.org/sqlite"
@@ -20,6 +21,7 @@ func CreateStartDB() (*Storage, error) {
 	ContextForAI := `
 	CREATE TABLE IF NOT EXISTS contextAI(
 		id INTEGER PRIMARY KEY,
+		role TEXT,
 		user_id BIGINT,
 		text TEXT
 	);`
@@ -39,6 +41,7 @@ func CreateStartDB() (*Storage, error) {
 func StoreToChatLogDB(stor *Storage, name string, text string) error {
 	query := "INSERT INTO ChatLogs(name, text) VALUES (?, ?)"
 	_, err := stor.db.Exec(query, name, text)
+	fmt.Println("CHATLOG: ", name, " TEXT: ", text)
 	return err
 }
 
@@ -60,34 +63,34 @@ func ReadFromChatLogDB(stor *Storage, val int64) (string, error) {
 	return s.String(), nil
 }
 
-func StoreToContextDB(stor *Storage, user_id int64, text string) error {
-	InsertQuery := `INSERT INTO contextAI (user_id, text) VALUES (?, ?)`
-	_, err := stor.db.Exec(InsertQuery, user_id, text)
+func StoreToContextDB(stor *Storage, user_id int64, model string, text string) error {
+	InsertQuery := `INSERT INTO contextAI (user_id, role, text) VALUES (?, ?, ?)`
+	_, err := stor.db.Exec(InsertQuery, user_id, model, text)
 	if err != nil {
 		return err
 	}
-	fmt.Println("USER_ID: ", user_id, "\n", "TEXT:", text)
+	fmt.Println("USER_ID: ", user_id, "\n MODEL: ", model, "\n", " TEXT:", text)
 	return nil
 }
 
-func ReadFromContextDB(stor *Storage, user_id int64) (string, error) {
-	ReadQuery := `SELECT text FROM contextAI WHERE user_id = ? ORDER BY id ASC LIMIT 20`
+func ReadFromContextDB(stor *Storage, user_id int64) ([]ai.Content, error) {
+	ReadQuery := `SELECT text, role FROM contextAI WHERE user_id = ? ORDER BY id ASC LIMIT 20`
 	rows, err := stor.db.Query(ReadQuery, user_id)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	var s strings.Builder
+	var history []ai.Content
 	for rows.Next() {
-		var r string
-		rows.Scan(&r)
-		s.WriteString(r + " ")
+		var r, m string
+		rows.Scan(&m, &r)
+		history = append(history, ai.Content{
+			Role:  r,
+			Parts: []ai.Part{{Text: m}},
+		})
 	}
 
-	if err = rows.Err(); err != nil {
-		return "", err
-	}
-	return s.String(), nil
+	return history, rows.Err()
 }
 
 func CloseDB(stor *Storage) {

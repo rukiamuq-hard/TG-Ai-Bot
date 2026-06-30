@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -13,37 +12,71 @@ import (
 )
 
 type request struct {
-	Contents []content `json:"contents"`
+	Contents []Content `json:"contents"`
 }
 
-type content struct {
-	Parts []part `json:"parts"`
+type Content struct {
+	Role  string `json:"role"`
+	Parts []Part `json:"parts"`
 }
 
-type part struct {
+type Part struct {
 	Text string `json:"text"`
 }
 
 type response struct {
 	Candidates []struct {
 		Content struct {
-			Parts []part `json:"parts"`
+			Parts []Part `json:"parts"`
 		} `json:"content"`
 	} `json:"candidates"`
 }
 
 func init() {
 	if err := godotenv.Load("../TokensChatId.env"); err != nil {
-		log.Print("Error load .env")
+		fmt.Println("error", err)
 	}
 }
 
-func GeminiGetResponse(text string) (string, error) {
+func GeminiGetResponse(history []Content, text string) (string, error) {
 	apiKey := os.Getenv("AI_TOKEN")
 	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=%s", apiKey)
+
+	history = append(history, Content{
+		Role:  "user",
+		Parts: []Part{{Text: text}},
+	})
+
 	body, err := json.Marshal(request{
-		Contents: []content{
-			{Parts: []part{{Text: text}}},
+		Contents: history,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		fmt.Println(err)
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var result response
+	json.NewDecoder(resp.Body).Decode(&result)
+
+	if len(result.Candidates) == 0 {
+		return "", errors.New("Empty Gemini reponse!")
+	}
+	return result.Candidates[0].Content.Parts[0].Text, nil
+}
+
+func GeminiGetResponseNoHistory(text string) (string, error) {
+	apiKey := os.Getenv("AI_TOKEN")
+	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=%s", apiKey)
+
+	body, err := json.Marshal(request{
+		Contents: []Content{
+			{Parts: []Part{{Text: text}}},
 		},
 	})
 	if err != nil {
@@ -52,7 +85,7 @@ func GeminiGetResponse(text string) (string, error) {
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 		return "", err
 	}
 	defer resp.Body.Close()
