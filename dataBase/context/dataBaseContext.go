@@ -18,6 +18,8 @@ func CreateStartDB() (*Storage, error) {
 		return nil, err
 	}
 
+	db.SetMaxOpenConns(1)
+
 	ContextForAI := `
 	CREATE TABLE IF NOT EXISTS contextAI(
 		id INTEGER PRIMARY KEY,
