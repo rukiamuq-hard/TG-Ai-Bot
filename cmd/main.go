@@ -17,7 +17,7 @@ import (
 
 func init() {
 	if err := godotenv.Load("../TokensChatId.env"); err != nil {
-		log.Print("Error load .env")
+		log.Fatal("Error load env: ", err)
 	}
 }
 
@@ -37,8 +37,7 @@ func main() {
 
 	prompt, err := os.ReadFile("prompt.txt")
 	if err != nil {
-		log.Println("Default working, without prompt")
-		log.Println(err)
+		log.Println("Default working, without prompt", err)
 	}
 
 	DB, err := dataBaseContext.CreateStartDB()
@@ -56,28 +55,34 @@ func main() {
 
 		resp, err := dataBaseContext.ReadFromContextDB(DB, c.Sender().ID)
 		if err != nil {
-			log.Fatal(err)
-			return c.Reply(err)
+			log.Println("Error: ", err)
+			return c.Reply("Error, try again")
 		}
 
 		response, err := ai.GeminiGetResponse(resp, "[PROMPT]: "+string(prompt)+"[QUESTION]: "+s)
 		if err != nil {
-			return c.Reply(err)
+			log.Println("Error: ", err)
+			return c.Reply("Error, try again")
 		}
 
 		err = dataBaseContext.StoreToContextDB(DB, c.Sender().ID, "user", s)
 		if err != nil {
-			log.Fatal(err)
+			log.Println("Error: ", err)
+			return c.Reply("Error, try again")
 		}
 		err = dataBaseContext.StoreToContextDB(DB, c.Sender().ID, "model", response)
 		if err != nil {
-			log.Fatal(err)
+			log.Println("Error: ", err)
+			return c.Reply("Error, try again!")
 		}
 		return c.Reply(response)
 	})
 
 	b.Handle(tele.OnText, func(c tele.Context) error {
-		dataBaseContext.StoreToChatLogDB(DB, c.Sender().FirstName+" "+c.Sender().LastName, c.Text())
+		err := dataBaseContext.StoreToChatLogDB(DB, c.Sender().FirstName+" "+c.Sender().LastName, c.Text())
+		if err != nil {
+			log.Fatal(err)
+		}
 		return nil
 	})
 
@@ -96,12 +101,13 @@ func main() {
 
 		str, err := dataBaseContext.ReadFromChatLogDB(DB, val)
 		if err != nil {
-			log.Fatal(err)
+			log.Println("Error: ", err)
+			return c.Reply("Error, try again later.")
 		}
 		response, err := ai.GeminiGetResponseNoHistory("(Всё что в скобках-системный промпт, твоя цель пересказать коротко что произошло в этих сообщениях, от самых левых, тоесть новых, к старым справа): " + str)
 		if err != nil {
-			log.Fatal(err)
-			return c.Reply(err)
+			log.Println("Error: ", err)
+			return c.Reply("Error, try again later.")
 		}
 		return c.Reply(response + " " + c.Message().Payload)
 	})
