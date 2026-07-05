@@ -60,7 +60,11 @@ func ReadFromChatLogDB(stor *Storage, val int64) (string, error) {
 		var n string
 		var t string
 		rows.Scan(&n, &t)
-		s.WriteString("NAME: " + n + " TEXT: " + t + "\n")
+		s.WriteString("NAME: ")
+		s.WriteString(n)
+		s.WriteString(" TEXT: ")
+		s.WriteString(t)
+		s.WriteString("\n")
 	}
 	return s.String(), nil
 }

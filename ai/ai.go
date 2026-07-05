@@ -85,7 +85,6 @@ func GeminiGetResponseNoHistory(text string) (string, error) {
 
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
 	if err != nil {
-		fmt.Println(err)
 		return "", err
 	}
 	defer resp.Body.Close()
