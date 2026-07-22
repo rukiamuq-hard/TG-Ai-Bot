@@ -1,11 +1,13 @@
 package handler
 
 import (
-	tele "gopkg.in/telebot.v4"
 	"log"
+	"os"
 	"strconv"
 	"strings"
 	"unicode"
+
+	tele "gopkg.in/telebot.v4"
 )
 
 func (h *Handler) GeminiGetResp(c tele.Context) error {
@@ -15,7 +17,12 @@ func (h *Handler) GeminiGetResp(c tele.Context) error {
 
 	s := strings.Join(c.Args(), " ")
 
-	resp, err := database.ReadFromContextDB(DB, c.Sender().ID)
+	prompt, err := os.ReadFile("prompt.txt")
+	if err != nil {
+		log.Println("Default working, without prompt", err)
+	}
+
+	resp, err := h.service.ReadFromContextDB(DB, c.Sender().ID)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again")
@@ -27,12 +34,12 @@ func (h *Handler) GeminiGetResp(c tele.Context) error {
 		return c.Reply("Error, try again")
 	}
 
-	err = dataBaseContext.StoreToContextDB(DB, c.Sender().ID, "user", s)
+	err = h.serviceContext.StoreToContextDB(DB, c.Sender().ID, "user", s)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again")
 	}
-	err = dataBaseContext.StoreToContextDB(DB, c.Sender().ID, "model", response)
+	err = h.serviceContext.StoreToContextDB(DB, c.Sender().ID, "model", response)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again!")
@@ -52,7 +59,7 @@ func (h *Handler) ChatLogs(c tele.Context) error {
 		val = 200
 	}
 
-	str, err := dataBaseContext.ReadFromChatLogDB(DB, val)
+	str, err := h.service.SerivceReadFromChatLogDB(val)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again later.")

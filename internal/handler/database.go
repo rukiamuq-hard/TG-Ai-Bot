@@ -6,7 +6,7 @@ import (
 )
 
 func (h *Handler) StoreMessage(c tele.Context) error {
-	err := dataBaseContext.StoreToChatLogDB(DB, c.Sender().FirstName+" "+c.Sender().LastName, c.Text())
+	err := h.service.ServiceStoreToChatLogDB(c.Sender().FirstName+" "+c.Sender().LastName, c.Text())
 	if err != nil {
 		log.Fatal(err)
 	}
