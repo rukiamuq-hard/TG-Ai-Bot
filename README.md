@@ -23,29 +23,53 @@ The bot is built with Go and utilizes several key components:
 ### Project Structure
 
 ```
-├── ai/
-│   └── ai.go                 # Handles communication with the Gemini API.
 ├── cmd/
-│   ├── main.go               # Main application entrypoint, bot logic, and command handlers.
-│   └── prompt.txt            # System prompt for configuring the AI's behavior.
-├── dataBase/
-│   └── context/
-│       └── dataBaseContext.go # Manages SQLite database operations.
-└── TokensChatId.env          # (User-created) For storing API tokens.
+│   ├── main.go                       # Main application entrypoint.
+│   └── prompt.txt                    # System prompt for configuring the AI's behavior.
+├── deployments/
+│   └── docker/
+│       ├── Dockerfile
+│       └── docker-compose.yml
+├── internal/
+│   ├── ai/
+│   │   └── ai.go                     # Handles communication with the Gemini API.
+│   ├── app/
+│   │   └── app.go                    # Application wiring/bootstrap.
+│   ├── handler/
+│   │   ├── database.go                # Telegram handlers for storing/retrieving messages.
+│   │   ├── gemini.go                  # Telegram handlers for the /Gemini command.
+│   │   └── handler.go                 # Handler struct and shared setup.
+│   ├── models/
+│   │   └── request.go                 # Shared request/data models.
+│   ├── repository/
+│   │   ├── mongodb/
+│   │   │   └── mongodb.go             # MongoDB repository implementation.
+│   │   └── sqlite/
+│   │       ├── chatlog.go             # SQLite chat log storage.
+│   │       ├── context.go             # SQLite conversation context storage.
+│   │       └── database.go            # SQLite connection/setup.
+│   └── service/
+│       ├── ai.go                      # AI-related service logic.
+│       ├── chatlog.go                 # Chat log service logic.
+│       ├── context.go                 # Context/history service logic.
+│       └── service.go                 # Service struct and shared setup.
+├── go.mod
+├── go.sum
+└── TokensChatId.env                   # (User-created) For storing API tokens.
 ```
 
 ## Setup and Installation
 
 1.  **Clone the repository:**
     ```sh
-    git clone https://github.com/rukiamuq-hard/tg-ai-bot.git
-    cd tg-ai-bot
+    git clone https://github.com/rukiamuq-hard/TG-Ai-Bot.git
+    cd TG-Ai-Bot
     ```
 
 2.  **Create a configuration file:**
-    Create a file named `TokensChatId.env` in the root directory. This file will store your secret keys.
+    Create a file named `.env` on cmd/:. This file will store your secret keys.
 
-3.  **Add API keys to `TokensChatId.env`:**
+3.  **Add API keys to `.env`**
     You will need a Telegram Bot token and a Google Gemini API key.
     ```env
     TOKEN="<YOUR_TELEGRAM_BOT_TOKEN>"
