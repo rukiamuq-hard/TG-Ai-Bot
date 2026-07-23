@@ -1,6 +1,10 @@
-# TG-Ai-Bot
+<h1 align="center">
+
+![TG-AI-BOT](docs/TgAiBot.svg)
+
 [![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/rukiamuq-hard/TG-Ai-Bot)
 
+</h1>
 A Telegram bot written in Go that integrates with Google's Gemini AI to provide conversational AI capabilities and chat summarization.
 
 ## Features

@@ -1,0 +1,107 @@
+<svg width="1280" height="320" viewBox="0 0 1280 320" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1420"/>
+      <stop offset="55%" stop-color="#0f1c2e"/>
+      <stop offset="100%" stop-color="#0a1622"/>
+    </linearGradient>
+
+    <linearGradient id="tgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4fc3f7"/>
+      <stop offset="100%" stop-color="#0d8ddb"/>
+    </linearGradient>
+
+    <linearGradient id="gopherBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7fd7ff"/>
+      <stop offset="100%" stop-color="#00acd7"/>
+    </linearGradient>
+
+    <radialGradient id="glowBlue" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#29b6f6" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#29b6f6" stop-opacity="0"/>
+    </radialGradient>
+
+    <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
+      <path d="M 34 0 L 0 0 0 34" fill="none" stroke="#132132" stroke-width="1"/>
+    </pattern>
+
+    <linearGradient id="logoBadge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d3b52"/>
+      <stop offset="55%" stop-color="#0a2c40"/>
+      <stop offset="100%" stop-color="#071e2c"/>
+    </linearGradient>
+
+    <linearGradient id="badgeEdge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4fc3f7" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#00acd7" stop-opacity="0.15"/>
+    </linearGradient>
+
+    <filter id="badgeShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#020a12" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <rect width="1280" height="320" fill="url(#grid)" opacity="0.6"/>
+  <circle cx="1000" cy="140" r="280" fill="url(#glowBlue)"/>
+
+  <!-- dotted flight path of the paper plane -->
+  <path d="M 40 250 C 300 40, 650 30, 1120 90" fill="none" stroke="#1c3a52" stroke-width="2" stroke-dasharray="2 10" stroke-linecap="round"/>
+
+  <!-- Telegram paper plane, large, upper right, following the path -->
+  <g transform="translate(1100,78) rotate(18)">
+    <path d="M 0 0 L 92 -8 L 14 34 L 8 62 L -12 30 Z" fill="url(#tgGrad)"/>
+    <path d="M 92 -8 L 14 34 L 46 46 Z" fill="#ffffff" opacity="0.25"/>
+    <path d="M -12 30 L 14 34 L 8 62 Z" fill="#0b6ea3" opacity="0.6"/>
+  </g>
+
+  <!-- app-icon style logo badge, left side: dark hexagon emblem with a bot face -->
+  <g transform="translate(160,175)" filter="url(#badgeShadow)">
+    <polygon points="0,-84 73,-42 73,42 0,84 -73,42 -73,-42" fill="url(#logoBadge)"/>
+    <polygon points="0,-84 73,-42 73,42 0,84 -73,42 -73,-42" fill="none" stroke="url(#badgeEdge)" stroke-width="2"/>
+
+    <!-- antenna with spark tip -->
+    <line x1="0" y1="-46" x2="0" y2="-62" stroke="#4fc3f7" stroke-width="4" stroke-linecap="round"/>
+    <path d="M 0 -78 l 5 12 12 5 -12 5 -5 12 -5 -12 -12 -5 12 -5 z" fill="#ffd166"/>
+
+    <!-- bot head -->
+    <rect x="-40" y="-46" width="80" height="60" rx="18" fill="none" stroke="#7fd7ff" stroke-width="4"/>
+    <!-- eyes -->
+    <circle cx="-16" cy="-20" r="7" fill="#4fc3f7"/>
+    <circle cx="16" cy="-20" r="7" fill="#4fc3f7"/>
+    <!-- mouth -->
+    <path d="M -14 0 h 28" stroke="#7fd7ff" stroke-width="4" stroke-linecap="round"/>
+    <!-- side nodes -->
+    <circle cx="-46" cy="-14" r="5" fill="#7fd7ff"/>
+    <circle cx="46" cy="-14" r="5" fill="#7fd7ff"/>
+  </g>
+
+  <!-- small sparkle accents = AI / Gemini touch -->
+  <g fill="#ffd166">
+    <path d="M 470 66 l 5 14 14 5 -14 5 -5 14 -5 -14 -14 -5 14 -5 z" opacity="0.9"/>
+    <path d="M 730 220 l 4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 z" opacity="0.7"/>
+  </g>
+
+  <!-- title -->
+  <g font-family="'Segoe UI', -apple-system, Helvetica, Arial, sans-serif">
+    <text x="300" y="140" font-size="56" font-weight="700" fill="#eaf6ff" letter-spacing="0.5">TG-<tspan fill="#4fc3f7">AI</tspan>-Bot</text>
+    <text x="302" y="174" font-size="19" fill="#8fb0c9">Gemini-powered Telegram bot, written in Go</text>
+
+    <!-- tag pills -->
+    <g font-size="14" font-weight="600" fill="#cfe6f7">
+      <rect x="302" y="196" width="60" height="28" rx="6" fill="#0e1c2c" stroke="#1f3b52"/>
+      <text x="332" y="214" text-anchor="middle" fill="#7fd7ff">Go</text>
+
+      <rect x="372" y="196" width="98" height="28" rx="6" fill="#0e1c2c" stroke="#1f3b52"/>
+      <text x="421" y="214" text-anchor="middle" fill="#4fc3f7">Telegram</text>
+
+      <rect x="480" y="196" width="88" height="28" rx="6" fill="#0e1c2c" stroke="#1f3b52"/>
+      <text x="524" y="214" text-anchor="middle" fill="#ffd166">Gemini</text>
+    </g>
+  </g>
+
+  <!-- top accent bar -->
+  <rect x="0" y="0" width="1280" height="4" fill="#29b6f6"/>
+  <path d="M 0 320 L 0 300 L 20 320 Z" fill="#29b6f6" opacity="0.6"/>
+</svg>
