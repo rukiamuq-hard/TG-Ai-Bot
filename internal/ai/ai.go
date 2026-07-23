@@ -12,6 +12,9 @@ import (
 
 const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key="
 
+type AI struct {
+}
+
 type Request struct {
 	Contents []models.Content `json:"contents"`
 }
@@ -24,7 +27,11 @@ type response struct {
 	} `json:"candidates"`
 }
 
-func GeminiGetResponse(history []models.Content, text string) (string, error) {
+func New() *AI {
+	return &AI{}
+}
+
+func (ai *AI) GeminiGetResponse(history []models.Content, text string) (string, error) {
 	apiKey := os.Getenv("AI_TOKEN")
 
 	history = append(history, models.Content{
@@ -55,7 +62,7 @@ func GeminiGetResponse(history []models.Content, text string) (string, error) {
 	return result.Candidates[0].Content.Parts[0].Text, nil
 }
 
-func GeminiGetResponseNoHistory(text string) (string, error) {
+func (ai *AI) GeminiGetResponseNoHistory(text string) (string, error) {
 	apiKey := os.Getenv("AI_TOKEN")
 
 	body, err := json.Marshal(Request{

@@ -13,14 +13,21 @@ type SQLite interface {
 
 //type MongoDB interface {}
 
+type AI interface {
+	GeminiGetResponse(history []models.Content, text string) (string, error)
+	GeminiGetResponseNoHistory(text string) (string, error)
+}
+
 type Service struct {
 	sqlDB SQLite
 	//	LogsDB MongoDB
+	ai AI
 }
 
-func New(sqlDB SQLite /*LogsDB MongoDB*/) *Service {
+func New(sqlDB SQLite /*LogsDB MongoDB*/, ai AI) *Service {
 	return &Service{
 		sqlDB: sqlDB,
 		//		LogsDB: LogsDB,
+		ai: ai,
 	}
 }

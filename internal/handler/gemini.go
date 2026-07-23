@@ -12,7 +12,7 @@ import (
 
 func (h *Handler) GeminiGetResp(c tele.Context) error {
 	if c.Args() == nil {
-		return c.Reply("Wrong format\nUse: /Gemini <prompt>\n")
+		return c.Reply("Usage: /Gemini <prompt>")
 	}
 
 	s := strings.Join(c.Args(), " ")
@@ -22,24 +22,24 @@ func (h *Handler) GeminiGetResp(c tele.Context) error {
 		log.Println("Default working, without prompt", err)
 	}
 
-	resp, err := h.service.ReadFromContextDB(DB, c.Sender().ID)
+	resp, err := h.service.ServiceReadFromContextDB(c.Sender().ID)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again")
 	}
 
-	response, err := ai.GeminiGetResponse(resp, "[PROMPT]: "+string(prompt)+"[QUESTION]: "+s)
+	response, err := h.service.ServiceGeminiGetResponse(resp, "[PROMPT]: "+string(prompt)+"[QUESTION]: "+s)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again")
 	}
 
-	err = h.serviceContext.StoreToContextDB(DB, c.Sender().ID, "user", s)
+	err = h.service.ServiceStoreToContextDB(c.Sender().ID, "user", s)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again")
 	}
-	err = h.serviceContext.StoreToContextDB(DB, c.Sender().ID, "model", response)
+	err = h.service.ServiceStoreToContextDB(c.Sender().ID, "model", response)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again!")
@@ -59,12 +59,12 @@ func (h *Handler) ChatLogs(c tele.Context) error {
 		val = 200
 	}
 
-	str, err := h.service.SerivceReadFromChatLogDB(val)
+	str, err := h.service.ServiceReadFromChatLogDB(val)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again later.")
 	}
-	response, err := ai.GeminiGetResponseNoHistory("(Всё что в скобках-системный промпт, твоя цель пересказать коротко что произошло в этих сообщениях, от самых левых, тоесть новых, к старым справа): " + str)
+	response, err := h.service.ServiceGeminiGetResponseNoHistory("(Всё что в скобках-системный промпт, твоя цель пересказать коротко что произошло в этих сообщениях, от самых левых, тоесть новых, к старым справа): " + str)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again later.")

@@ -1,6 +1,9 @@
 package main
 
-import ()
+import (
+	"TgAiBot/internal"
+	"log"
+)
 
 func main() {
 }

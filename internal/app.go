@@ -1,6 +1,7 @@
 package app
 
 import (
+	"TgAiBot/internal/ai"
 	"TgAiBot/internal/handler"
 	"TgAiBot/internal/repository/sqlite"
 	"TgAiBot/internal/service"
@@ -15,7 +16,8 @@ import (
 type App struct {
 	svc   *service.Service
 	SQLdb *database.SQLite
-	//	LogsDB //mongodb
+	//	LogsDB mongodb
+	ai *ai.AI
 }
 
 func init() {
@@ -29,8 +31,12 @@ func New() *App {
 }
 
 func (app *App) Start() error {
-	app = &App{}
 	token := os.Getenv("TOKEN")
+
+	app.SQLdb = database.New()
+	app.ai = ai.New()
+	_Service := service.New(app.SQLdb, app.ai)
+	h := handler.New(_Service) // need service
 
 	pref := tele.Settings{
 		Token:  token,
@@ -42,15 +48,6 @@ func (app *App) Start() error {
 		return err
 	}
 
-	prompt, err := os.ReadFile("prompt.txt")
-	if err != nil {
-		log.Println("Default working, without prompt", err)
-	}
-
-	app.SQLdb = database.New()
-	_Service := service.New(app.SQLdb)
-	h := handler.New(_Service) // need service
-
 	b.Handle("/Gemini", h.GeminiGetResp)
 
 	b.Handle(tele.OnText, h.StoreMessage)
@@ -58,4 +55,6 @@ func (app *App) Start() error {
 	b.Handle("/ChatLogs", h.ChatLogs)
 
 	b.Start()
+
+	return nil
 }
