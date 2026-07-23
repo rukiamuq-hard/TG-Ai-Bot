@@ -1,60 +1,52 @@
 package ai
 
 import (
+	"TgAiBot/internal/models"
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
-type request struct {
-	Contents []Content `json:"contents"`
+const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key="
+
+type AI struct {
 }
 
-type Content struct {
-	Role  string `json:"role"`
-	Parts []Part `json:"parts"`
-}
-
-type Part struct {
-	Text string `json:"text"`
+type Request struct {
+	Contents []models.Content `json:"contents"`
 }
 
 type response struct {
 	Candidates []struct {
 		Content struct {
-			Parts []Part `json:"parts"`
+			Parts []models.Part `json:"parts"`
 		} `json:"content"`
 	} `json:"candidates"`
 }
 
-func init() {
-	if err := godotenv.Load("../TokensChatId.env"); err != nil {
-		fmt.Println("error", err)
-	}
+func New() *AI {
+	return &AI{}
 }
 
-func GeminiGetResponse(history []Content, text string) (string, error) {
+func (ai *AI) GeminiGetResponse(history []models.Content, text string) (string, error) {
 	apiKey := os.Getenv("AI_TOKEN")
-	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=%s", apiKey)
 
-	history = append(history, Content{
+	history = append(history, models.Content{
 		Role:  "user",
-		Parts: []Part{{Text: text}},
+		Parts: []models.Part{{Text: text}},
 	})
 
-	body, err := json.Marshal(request{
+	body, err := json.Marshal(Request{
 		Contents: history,
 	})
 	if err != nil {
 		return "", err
 	}
 
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
+	resp, err := http.Post(url+apiKey, "application/json", bytes.NewBuffer(body))
 	if err != nil {
 		fmt.Println(err)
 		return "", err
@@ -70,20 +62,19 @@ func GeminiGetResponse(history []Content, text string) (string, error) {
 	return result.Candidates[0].Content.Parts[0].Text, nil
 }
 
-func GeminiGetResponseNoHistory(text string) (string, error) {
+func (ai *AI) GeminiGetResponseNoHistory(text string) (string, error) {
 	apiKey := os.Getenv("AI_TOKEN")
-	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=%s", apiKey)
 
-	body, err := json.Marshal(request{
-		Contents: []Content{
-			{Parts: []Part{{Text: text}}},
+	body, err := json.Marshal(Request{
+		Contents: []models.Content{
+			{Parts: []models.Part{{Text: text}}},
 		},
 	})
 	if err != nil {
 		return "", err
 	}
 
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
+	resp, err := http.Post(url+apiKey, "application/json", bytes.NewBuffer(body))
 	if err != nil {
 		return "", err
 	}
