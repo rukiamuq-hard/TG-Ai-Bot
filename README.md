@@ -26,6 +26,7 @@ The bot is built with Go and utilizes several key components:
 ├── cmd/
 │   ├── main.go                       # Main application entrypoint.
 │   └── prompt.txt                    # System prompt for configuring the AI's behavior.
+├── .env                   # (User-created) For storing API tokens.
 ├── deployments/
 │   └── docker/
 │       ├── Dockerfile
@@ -55,7 +56,6 @@ The bot is built with Go and utilizes several key components:
 │       └── service.go                 # Service struct and shared setup.
 ├── go.mod
 ├── go.sum
-└── TokensChatId.env                   # (User-created) For storing API tokens.
 ```
 
 ## Setup and Installation

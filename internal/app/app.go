@@ -3,7 +3,7 @@ package app
 import (
 	"TgAiBot/internal/ai"
 	"TgAiBot/internal/handler"
-	"TgAiBot/internal/repository/sqlite"
+	"TgAiBot/internal/repository/database"
 	"TgAiBot/internal/service"
 	"log"
 	"os"
@@ -35,16 +35,17 @@ func (app *App) Start() error {
 
 	app.SQLdb = database.New()
 	app.ai = ai.New()
-	_Service := service.New(app.SQLdb, app.ai)
-	h := handler.New(_Service) // need service
+	_Service := service.New(app.SQLdb, app.SQLdb, app.ai) // first arg is ChatLogDB, second is ContextDB
+	h := handler.New(_Service)
 
 	err := app.SQLdb.CreateStartDB()
 	if err != nil {
 		return err
 	}
+
 	pref := tele.Settings{
 		Token:  token,
-		Poller: &tele.LongPoller{Timeout: 5 * time.Second},
+		Poller: &tele.LongPoller{Timeout: 5 * time.Second}, // how fast bot check message
 	}
 
 	b, err := tele.NewBot(pref)

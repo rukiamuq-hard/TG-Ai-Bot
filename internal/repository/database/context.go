@@ -2,6 +2,7 @@ package database
 
 import (
 	"TgAiBot/internal/models"
+	"context"
 	"fmt"
 	_ "modernc.org/sqlite"
 )
@@ -18,8 +19,8 @@ const InsertContextByIDRT = `INSERT INTO Context (user_id, role, text) VALUES (?
 
 const ReadFromContextDB = `SELECT text, role FROM Context WHERE user_id = ? ORDER BY id ASC LIMIT 20`
 
-func (SQLdb *SQLite) StoreToContextDB(user_id int64, model string, text string) error {
-	_, err := SQLdb.db.Exec(InsertContextByIDRT, user_id, model, text)
+func (SQLdb *SQLite) StoreToContextDB(ctx context.Context, user_id int64, model string, text string) error {
+	_, err := SQLdb.db.ExecContext(ctx, InsertContextByIDRT, user_id, model, text)
 	if err != nil {
 		return err
 	}
@@ -27,8 +28,8 @@ func (SQLdb *SQLite) StoreToContextDB(user_id int64, model string, text string) 
 	return nil
 }
 
-func (SQLdb *SQLite) ReadFromContextDB(user_id int64) ([]models.Content, error) {
-	rows, err := SQLdb.db.Query(ReadFromContextDB, user_id)
+func (SQLdb *SQLite) ReadFromContextDB(ctx context.Context, user_id int64) ([]models.Content, error) {
+	rows, err := SQLdb.db.QueryContext(ctx, ReadFromContextDB, user_id)
 	if err != nil {
 		return nil, err
 	}
