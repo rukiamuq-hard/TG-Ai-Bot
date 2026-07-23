@@ -2,31 +2,37 @@ package service
 
 import (
 	"TgAiBot/internal/models"
+	"context"
 )
 
-type DB interface {
-	StoreToChatLogDB(name string, text string) error
-	ReadFromChatLogDB(val int64) (string, error)
-	StoreToContextDB(user_id int64, model string, text string) error
-	ReadFromContextDB(user_id int64) ([]models.Content, error)
+type ChatLogRepository interface {
+	StoreToChatLogDB(ctx context.Context, name string, text string) error
+	ReadFromChatLogDB(ctx context.Context, val int64) (string, error)
+}
+
+type ContextRepository interface {
+	StoreToContextDB(ctx context.Context, ser_id int64, model string, text string) error
+	ReadFromContextDB(ctx context.Context, ser_id int64) ([]models.Content, error)
 }
 
 //type MongoDB interface {}
 
 type AI interface {
-	GeminiGetResponse(history []models.Content, text string) (string, error)
-	GeminiGetResponseNoHistory(text string) (string, error)
+	GeminiGetResponse(ctx context.Context, istory []models.Content, text string) (string, error)
+	GeminiGetResponseNoHistory(ctx context.Context, ext string) (string, error)
 }
 
 type Service struct {
-	sqlDB DB
+	DBChatLog ChatLogRepository
+	DBContext ContextRepository
 	//	LogsDB MongoDB
 	ai AI
 }
 
-func New(sqlDB DB /*LogsDB MongoDB*/, ai AI) *Service {
+func New(DBChatLog ChatLogRepository, DBContext ContextRepository /*LogsDB MongoDB*/, ai AI) *Service {
 	return &Service{
-		sqlDB: sqlDB,
+		DBChatLog: DBChatLog,
+		DBContext: DBContext,
 		//		LogsDB: LogsDB,
 		ai: ai,
 	}
