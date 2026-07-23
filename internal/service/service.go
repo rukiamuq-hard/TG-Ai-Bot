@@ -4,7 +4,7 @@ import (
 	"TgAiBot/internal/models"
 )
 
-type SQLite interface {
+type DB interface {
 	StoreToChatLogDB(name string, text string) error
 	ReadFromChatLogDB(val int64) (string, error)
 	StoreToContextDB(user_id int64, model string, text string) error
@@ -19,12 +19,12 @@ type AI interface {
 }
 
 type Service struct {
-	sqlDB SQLite
+	sqlDB DB
 	//	LogsDB MongoDB
 	ai AI
 }
 
-func New(sqlDB SQLite /*LogsDB MongoDB*/, ai AI) *Service {
+func New(sqlDB DB /*LogsDB MongoDB*/, ai AI) *Service {
 	return &Service{
 		sqlDB: sqlDB,
 		//		LogsDB: LogsDB,
