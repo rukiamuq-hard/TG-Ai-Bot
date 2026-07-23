@@ -28,38 +28,45 @@ The bot is built with Go and utilizes several key components:
 
 ```
 ├── cmd/
+│   ├── .env                          # (User-created) API keys and tokens.
+│   ├── ChatHistory.db                # SQLite database file, created on first run.
 │   ├── main.go                       # Main application entrypoint.
 │   └── prompt.txt                    # System prompt for configuring the AI's behavior.
-├── .env                   # (User-created) For storing API tokens.
 ├── deployments/
 │   └── docker/
-│       ├── Dockerfile
-│       └── docker-compose.yml
+│       ├── docker-compose.yml
+│       └── Dockerfile
+├── docs/
+│   └── TgAiBot.svg                   # Architecture/project diagram.
 ├── internal/
 │   ├── ai/
-│   │   └── ai.go                     # Handles communication with the Gemini API.
+│   │   ├── ai.go                     # Gemini API client setup.
+│   │   ├── chatlog.go                # AI request logic for chat log summarization.
+│   │   └── gemini.go                 # AI request/response logic for /Gemini.
 │   ├── app/
 │   │   └── app.go                    # Application wiring/bootstrap.
 │   ├── handler/
-│   │   ├── database.go                # Telegram handlers for storing/retrieving messages.
-│   │   ├── gemini.go                  # Telegram handlers for the /Gemini command.
-│   │   └── handler.go                 # Handler struct and shared setup.
+│   │   ├── database.go               # Telegram handlers for storing/retrieving messages.
+│   │   ├── gemini.go                 # Telegram handler for the /Gemini command.
+│   │   └── handler.go                # Handler struct and shared setup.
 │   ├── models/
-│   │   └── request.go                 # Shared request/data models.
+│   │   └── request.go                # Shared request/data models.
 │   ├── repository/
-│   │   ├── mongodb/
-│   │   │   └── mongodb.go             # MongoDB repository implementation.
-│   │   └── sqlite/
-│   │       ├── chatlog.go             # SQLite chat log storage.
-│   │       ├── context.go             # SQLite conversation context storage.
-│   │       └── database.go            # SQLite connection/setup.
+│   │   ├── database/
+│   │   │   ├── chatlog.go            # SQLite chat log storage.
+│   │   │   ├── context.go            # SQLite conversation context storage.
+│   │   │   └── database.go           # SQLite connection/setup.
+│   │   └── mongodb/
+│   │       └── mongodb.go            # MongoDB repository implementation.
 │   └── service/
-│       ├── ai.go                      # AI-related service logic.
-│       ├── chatlog.go                 # Chat log service logic.
-│       ├── context.go                 # Context/history service logic.
-│       └── service.go                 # Service struct and shared setup.
+│       ├── ai.go                     # AI-related service logic.
+│       ├── chatlog.go                # Chat log service logic.
+│       ├── context.go                # Context/history service logic.
+│       └── service.go                # Service struct and shared setup.
+├── .gitignore
 ├── go.mod
 ├── go.sum
+└── README.md
 ```
 
 ## Setup and Installation
