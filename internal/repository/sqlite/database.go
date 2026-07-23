@@ -27,6 +27,6 @@ func (SQLdb *SQLite) CreateStartDB() error {
 	return nil
 }
 
-func (SQLdb *SQLite) CloseDB(stor *SQLite) {
-	stor.db.Close()
+func (SQLdb *SQLite) CloseDB() {
+	SQLdb.db.Close()
 }

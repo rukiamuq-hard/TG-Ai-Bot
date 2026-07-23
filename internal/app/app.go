@@ -38,6 +38,10 @@ func (app *App) Start() error {
 	_Service := service.New(app.SQLdb, app.ai)
 	h := handler.New(_Service) // need service
 
+	err := app.SQLdb.CreateStartDB()
+	if err != nil {
+		return err
+	}
 	pref := tele.Settings{
 		Token:  token,
 		Poller: &tele.LongPoller{Timeout: 5 * time.Second},
@@ -57,4 +61,8 @@ func (app *App) Start() error {
 	b.Start()
 
 	return nil
+}
+
+func (app *App) Close() {
+	app.SQLdb.CloseDB()
 }
