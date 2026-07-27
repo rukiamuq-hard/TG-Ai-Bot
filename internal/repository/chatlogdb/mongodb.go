@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-const url = "mongodb://localhost:27017""
+const url = "mongodb://localhost:27017"
 
 type LogsDB struct {
 	client     *mongo.Client
