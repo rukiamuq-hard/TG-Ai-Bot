@@ -57,7 +57,8 @@ The bot is built with Go and utilizes several key components:
 │   │   │   ├── context.go            # SQLite conversation context storage.
 │   │   │   └── database.go           # SQLite connection/setup.
 │   │   └── mongodb/
-│   │       └── mongodb.go            # MongoDB repository implementation.
+│   │       ├─── mongodb.go            # MongoDB repository struct and shared setup.
+│   │       └─── chatlog.go            # MongoDB storing/reading chatlog table
 │   └── service/
 │       ├── ai.go                     # AI-related service logic.
 │       ├── chatlog.go                # Chat log service logic.
