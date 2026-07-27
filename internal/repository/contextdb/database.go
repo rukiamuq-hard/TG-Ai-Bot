@@ -23,7 +23,6 @@ func (SQLdb *SQLite) CreateStartDB() error {
 	SQLdb.db.SetMaxOpenConns(1)
 
 	SQLdb.db.Exec(ContextDB)
-	SQLdb.db.Exec(ChatHistoryDB)
 	return nil
 }
 

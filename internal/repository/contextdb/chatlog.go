@@ -1,5 +1,6 @@
 package database
 
+/*
 import (
 	"context"
 	"fmt"
@@ -46,3 +47,4 @@ func (SQLdb *SQLite) ReadFromChatLogDB(ctx context.Context, val int64) (string, 
 	}
 	return s.String(), nil
 }
+*/
