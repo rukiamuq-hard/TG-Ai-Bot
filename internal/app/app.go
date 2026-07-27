@@ -3,9 +3,11 @@ package app
 import (
 	"TgAiBot/internal/ai"
 	"TgAiBot/internal/handler"
-	"TgAiBot/internal/repository/database"
+	"TgAiBot/internal/repository/chatlogdb"
+	"TgAiBot/internal/repository/contextdb"
 	"TgAiBot/internal/service"
 	"log"
+
 	"os"
 	"time"
 
@@ -14,10 +16,10 @@ import (
 )
 
 type App struct {
-	svc   *service.Service
-	SQLdb *database.SQLite
-	//	LogsDB mongodb
-	ai *ai.AI
+	svc    *service.Service
+	ctxDB  *database.SQLite
+	logsDB *mongodb.LogsDB
+	ai     *ai.AI
 }
 
 func init() {
@@ -33,12 +35,19 @@ func New() *App {
 func (app *App) Start() error {
 	token := os.Getenv("TOKEN")
 
-	app.SQLdb = database.New()
+	app.ctxDB = database.New()
 	app.ai = ai.New()
-	_Service := service.New(app.SQLdb, app.SQLdb, app.ai) // first arg is ChatLogDB, second is ContextDB
+	app.logsDB = mongodb.New()
+
+	_Service := service.New(app.logsDB, app.ctxDB, app.ai) // first arg is ChatLogDB, second is ContextDB
 	h := handler.New(_Service)
 
-	err := app.SQLdb.CreateStartDB()
+	err := app.logsDB.ConnectDB()
+	if err != nil {
+		return err
+	}
+
+	err = app.ctxDB.CreateStartDB()
 	if err != nil {
 		return err
 	}
@@ -65,5 +74,6 @@ func (app *App) Start() error {
 }
 
 func (app *App) Close() {
-	app.SQLdb.CloseDB()
+	app.ctxDB.CloseDB()
+	app.logsDB.Close()
 }
