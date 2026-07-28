@@ -19,9 +19,9 @@ A Telegram bot written in Go that integrates with Google's Gemini AI to provide 
 
 The bot is built with Go and utilizes several key components:
 
-*   **`gopkg.in/telebot.v4`**: A framework for building Telegram bots in Go.
-*   **Google Gemini API**: Provides the generative AI capabilities.
+*   **`go telebot.v4`**: A framework for building Telegram bots in Go.
 *   **SQLite**: A self-contained, serverless SQL database engine used for storing all conversation data.
+*   **`mongodb`**: NOSQL database for saving chatlogs.
 *   **`godotenv`**: Manages environment variables for API keys and tokens.
 
 ### Project Structure
@@ -53,7 +53,6 @@ The bot is built with Go and utilizes several key components:
 │   │   └── request.go                # Shared request/data models.
 │   ├── repository/
 │   │   ├── database/
-│   │   │   ├── chatlog.go            # SQLite chat log storage.
 │   │   │   ├── context.go            # SQLite conversation context storage.
 │   │   │   └── database.go           # SQLite connection/setup.
 │   │   └── mongodb/
