@@ -34,8 +34,11 @@ The bot is built with Go and utilizes several key components:
 │   └── prompt.txt                    # System prompt for configuring the AI's behavior.
 ├── deployments/
 │   └── docker/
-│       ├── docker-compose.yml
-│       └── Dockerfile
+│       ├── data/
+│       │   └── ChatHistory.db        # SQLite database (created automatically).
+│       ├── docker-compose.yml        # Docker Compose configuration.
+│       ├── Dockerfile                # Docker image definition.
+│       └── .dockerignore
 ├── docs/
 │   └── TgAiBot.svg                   # Architecture/project diagram.
 ├── internal/
@@ -68,37 +71,46 @@ The bot is built with Go and utilizes several key components:
 ├── go.sum
 └── README.md
 ```
-
 ## Setup and Installation
 
-1.  **Clone the repository:**
-    ```sh
-    git clone https://github.com/rukiamuq-hard/TG-Ai-Bot.git
-    cd TG-Ai-Bot
-    ```
+1. **Clone the repository**
 
-2.  **Create a configuration file:**
-    Create a file named `.env` on cmd/:. This file will store your secret keys.
+```sh
+git clone https://github.com/rukiamuq-hard/TG-Ai-Bot.git
+cd TG-Ai-Bot
+```
 
-3.  **Add API keys to `.env`**
-    You will need a Telegram Bot token and a Google Gemini API key.
-    ```env
-    TOKEN="<YOUR_TELEGRAM_BOT_TOKEN>"
-    AI_TOKEN="<YOUR_GEMINI_API_KEY>"
-    ```
+2. **Create the environment file**
 
-4.  **Install dependencies:**
-    ```sh
-    go mod tidy
-    ```
+Create `cmd/.env`:
 
-5.  **Run the bot:**
-    Navigate to the `cmd` directory and run the main file.
-    ```sh
-    cd cmd
-    go run main.go
-    ```
-    The bot will start, create a `ChatHistory.db` file if one doesn't exist, and begin polling for messages.
+```env
+TOKEN=<YOUR_TELEGRAM_BOT_TOKEN>
+AI_TOKEN=<YOUR_GEMINI_API_KEY>
+MONGO_URI=mongodb://root:root@mongo:27017
+```
+
+3. **Build and start the application**
+
+```sh
+make up
+```
+
+Docker Compose will automatically:
+
+- build the image;
+- create the SQLite database if it does not exist;
+- start the bot.
+
+## Useful Make commands
+
+```sh
+make up        # Build and start containers
+make down      # Stop containers
+make restart   # Restart containers
+make logs      # View container logs
+make rebuild   # Rebuild image and restart
+```
 
 ## Usage
 
