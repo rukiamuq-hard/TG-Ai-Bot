@@ -5,41 +5,29 @@ services:
     build:
       context: ../../
       dockerfile: deployments/docker/Dockerfile
-
     container_name: tg-ai-bot
-
     restart: unless-stopped
-
     depends_on:
       - mongo
-
     env_file:
       - ../../cmd/.env
-
     ports:
       - "8080:8080"
-
     networks:
       - tg-network
 
   mongo:
     image: mongo:8
-
     container_name: tg-ai-mongo
-
     restart: unless-stopped
-
     ports:
       - "27017:27017"
-
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
-
     volumes:
       - mongo_data:/data/db
-      - ./data:/app/data
-      - ./cmd/ChatHistory.db:/app/ChatHistory.db
+      - ../../cmd:/app/cmd 
     networks:
       - tg-network
 
