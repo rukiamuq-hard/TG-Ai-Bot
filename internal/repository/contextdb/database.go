@@ -15,7 +15,7 @@ func New() *SQLite {
 
 func (SQLdb *SQLite) CreateStartDB() error {
 	var err error
-	SQLdb.db, err = sql.Open("sqlite", "./ChatHistory.db")
+	SQLdb.db, err = sql.Open("sqlite", "ChatHistory.db")
 	if err != nil {
 		return err
 	}

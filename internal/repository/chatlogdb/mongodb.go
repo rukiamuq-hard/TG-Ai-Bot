@@ -5,9 +5,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"os"
 )
-
-const url = "mongodb://localhost:27017"
 
 type LogsDB struct {
 	client     *mongo.Client
@@ -21,7 +20,7 @@ func New() *LogsDB {
 func (mdb *LogsDB) ConnectDB() error {
 
 	var err error
-	mdb.client, err = mongo.Connect(options.Client().ApplyURI(url))
+	mdb.client, err = mongo.Connect(options.Client().ApplyURI(os.Getenv("MONGO_URI")))
 	if err != nil {
 		return err
 	}
