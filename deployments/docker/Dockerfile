@@ -21,8 +21,6 @@ RUN apk add --no-cache ca-certificates tzdata
 
 COPY --from=builder /app/tg-ai-bot .
 COPY cmd/prompt.txt .
-COPY cmd/.env .env
-COPY cmd/.env ./cmd/.env
 
 EXPOSE 8080
 

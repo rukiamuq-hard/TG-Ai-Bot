@@ -6,8 +6,9 @@ import (
 )
 
 type ChatLogRepository interface {
-	StoreToChatLogDB(ctx context.Context, name string, text string) error
-	ReadFromChatLogDB(ctx context.Context, val int64) (string, error)
+	StoreToChatLogDB(ctx context.Context, models.History) error
+	ReadFromChatLogDB(ctx context.Context, val int64) ([]models.History, string, error)
+	DeleteMessage(ctx context.Context, val int64) error
 }
 
 type ContextRepository interface {
