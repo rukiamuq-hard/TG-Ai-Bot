@@ -8,6 +8,10 @@ up:
 down:
 	$(COMPOSE) down
 
+restart:
+	$(COMPOSE) down
+	$(COMPOSE) up -d --build
+
 logs:
 	$(COMPOSE) logs -f
 

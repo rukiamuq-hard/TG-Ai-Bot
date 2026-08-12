@@ -2,8 +2,8 @@ package models
 
 type History struct {
 	Name string `bson:"name"`
-	UID  string `bson:"uid"`
+	UID  int64  `bson:"uid"`
 	Text string `bson:"text"`
-	CID  string `bson:"id"`
-	MID  string `bson:"id"`
+	CID  int64  `bson:"cid"`
+	MID  int    `bson:"mid"`
 }

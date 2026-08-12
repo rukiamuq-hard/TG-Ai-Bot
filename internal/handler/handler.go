@@ -7,9 +7,9 @@ import (
 
 type Service interface {
 	//ChatLogDB
-	ServiceStoreToChatLogDB(ctx context.Context, name string, text string) error
+	ServiceStoreToChatLogDB(ctx context.Context, hist models.History) error
 	ServiceReadFromChatLogDB(ctx context.Context, val int64) ([]models.History, string, error)
-	ServiceDeleteFromChatLogDB(ctx context.Context, val int64) error
+	ServiceDeleteFromChatLogDB(ctx context.Context, chat_id int64, val int64) error
 
 	//context DB is down
 	ServiceStoreToContextDB(ctx context.Context, user_id int64, model string, text string) error

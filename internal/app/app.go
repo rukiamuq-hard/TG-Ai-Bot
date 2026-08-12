@@ -39,7 +39,7 @@ func (app *App) Start() error {
 	app.ai = ai.New()
 	app.logsDB = mongodb.New()
 
-	_Service := service.New(app.logsDB, app.ctxDB, app.ai) // first arg is ChatLogDB, second is ContextDB
+	_Service := service.New(app.logsDB, app.ctxDB, app.ai)
 	h := handler.New(_Service)
 
 	err := app.logsDB.ConnectDB()

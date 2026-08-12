@@ -49,12 +49,14 @@ func (h *Handler) GetHistory(c tele.Context) error {
 	defer cancel()
 	for _, s := range c.Message().Payload {
 		if unicode.IsLetter(s) || unicode.IsSymbol(s) {
-			return c.Reply("Wrong format. Use numbers")
+			return c.Reply("Usage: ChatLogs <number>")
 		}
 	}
 
 	val, _ := strconv.ParseInt(c.Message().Payload, 10, 64)
-
+	if val <= 0 {
+		return c.Reply("Incorrect argument")
+	}
 	_, str, err := h.service.ServiceReadFromChatLogDB(ctx, val)
 	if err != nil {
 		log.Println("Error: ", err)

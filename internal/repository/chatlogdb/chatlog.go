@@ -3,7 +3,6 @@ package mongodb
 import (
 	"TgAiBot/internal/models"
 	"context"
-	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -19,10 +18,6 @@ func (mdb *LogsDB) StoreToChatLogDB(ctx context.Context, hist models.History) er
 }
 
 func (mdb *LogsDB) ReadFromChatLogDB(ctx context.Context, val int64) ([]models.History, string, error) {
-	if val == 0 {
-		val = 200
-	}
-
 	opts := options.Find().
 		SetSort(bson.D{{Key: "_id", Value: -1}}).SetLimit(val)
 
@@ -43,25 +38,22 @@ func (mdb *LogsDB) ReadFromChatLogDB(ctx context.Context, val int64) ([]models.H
 	sb.Grow(lenHis)
 
 	for _, his := range his {
-		sb.WriteString(fmt.Sprintf("Name: %s, Text:%s", his.Name, his.UID, his.Text, his.CID, his.MID))
+		logs := fmt.Sprintf("Name: %s, UID:%d, Text:%s, CID:%d, MID:%d", his.Name, his.UID, his.Text, his.CID, his.MID)
+		sb.WriteString(logs)
 	}
 	return his, sb.String(), nil
 }
 
-func (mdb *LogsDB) DeleteMessage(ctx context.Context, chat_id string, val int64) error {
-	if val == 0 {
-		val = 10
-	}
-
+func (mdb *LogsDB) DeleteMessage(ctx context.Context, chat_id int64, val int64) error {
 	options := options.Find().
 		SetSort(bson.D{
-			{Key: "created_at", Value: -1},
-			{Key: "_id", Value: -1},
+			{Key: "mid", Value: -1},
+			{Key: "cid", Value: -1},
 		}).
 		SetLimit(val)
 
 	cursor, err := mdb.collection.Find(ctx, bson.M{
-		"chat_id": chat_id,
+		"cid": chat_id,
 	}, options)
 
 	if err != nil {
@@ -78,7 +70,7 @@ func (mdb *LogsDB) DeleteMessage(ctx context.Context, chat_id string, val int64)
 	}
 
 	if len(docs) == 0 {
-		return errors.New("no message to delete")
+		return fmt.Errorf("No message to delete")
 	}
 
 	ids := make([]any, len(docs))
