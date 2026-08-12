@@ -6,8 +6,8 @@ import (
 	"TgAiBot/internal/repository/chatlogdb"
 	"TgAiBot/internal/repository/contextdb"
 	"TgAiBot/internal/service"
-	"log"
 
+	"fmt"
 	"os"
 	"time"
 
@@ -24,7 +24,7 @@ type App struct {
 
 func init() {
 	if err := godotenv.Load(".env"); err != nil {
-		log.Fatal("Error load env: ", err)
+		fmt.Println("No env found, using standart env!")
 	}
 }
 
@@ -39,7 +39,7 @@ func (app *App) Start() error {
 	app.ai = ai.New()
 	app.logsDB = mongodb.New()
 
-	_Service := service.New(app.logsDB, app.ctxDB, app.ai) // first arg is ChatLogDB, second is ContextDB
+	_Service := service.New(app.logsDB, app.ctxDB, app.ai)
 	h := handler.New(_Service)
 
 	err := app.logsDB.ConnectDB()
@@ -62,11 +62,13 @@ func (app *App) Start() error {
 		return err
 	}
 
-	b.Handle("/Gemini", h.GeminiGetResp)
-
 	b.Handle(tele.OnText, h.StoreMessage)
 
-	b.Handle("/ChatLogs", h.ChatLogs)
+	b.Handle("/Gemini", h.GeminiGetResp)
+
+	b.Handle("/ChatLogs", h.GetHistory)
+
+	b.Handle("/Clear", h.ClearMessage)
 
 	b.Start()
 

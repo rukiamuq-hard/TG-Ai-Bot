@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Handler) GeminiGetResp(c tele.Context) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	if c.Args() == nil {
 		return c.Reply("Usage: /Gemini <prompt>")
@@ -44,21 +44,20 @@ func (h *Handler) GeminiGetResp(c tele.Context) error {
 	return c.Reply(response)
 }
 
-func (h *Handler) ChatLogs(c tele.Context) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (h *Handler) GetHistory(c tele.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second) // ai context time need to be 10 or 10+ seconds
 	defer cancel()
 	for _, s := range c.Message().Payload {
 		if unicode.IsLetter(s) || unicode.IsSymbol(s) {
-			return c.Reply("Wrong format. Use numbers")
+			return c.Reply("Usage: ChatLogs <number>")
 		}
 	}
 
 	val, _ := strconv.ParseInt(c.Message().Payload, 10, 64)
-	if val == 0 {
-		val = 200
+	if val <= 0 {
+		return c.Reply("Incorrect argument")
 	}
-
-	str, err := h.service.ServiceReadFromChatLogDB(ctx, val)
+	_, str, err := h.service.ServiceReadFromChatLogDB(ctx, val)
 	if err != nil {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again later.")

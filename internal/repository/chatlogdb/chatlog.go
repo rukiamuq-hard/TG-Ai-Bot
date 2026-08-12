@@ -1,29 +1,15 @@
 package mongodb
 
 import (
+	"TgAiBot/internal/models"
 	"context"
 	"fmt"
-	"strings"
-
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"strings"
 )
 
-type history struct {
-	Name string `bson:"name"`
-	Text string `bson:"text"`
-}
-
-func (mdb *LogsDB) PingDB(ctx context.Context) error {
-	if err := mdb.client.Ping(ctx, nil); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (mdb *LogsDB) StoreToChatLogDB(ctx context.Context, name string, text string) error {
-	fmt.Println("Name: ", name, " Text: ", text)
-	hist := history{Name: name, Text: text}
+func (mdb *LogsDB) StoreToChatLogDB(ctx context.Context, hist models.History) error {
 	_, err := mdb.collection.InsertOne(ctx, hist)
 	if err != nil {
 		return err
@@ -31,23 +17,19 @@ func (mdb *LogsDB) StoreToChatLogDB(ctx context.Context, name string, text strin
 	return nil
 }
 
-func (mdb *LogsDB) ReadFromChatLogDB(ctx context.Context, val int64) (string, error) {
-	if val == 0 {
-		val = 200
-	}
-
+func (mdb *LogsDB) ReadFromChatLogDB(ctx context.Context, val int64) ([]models.History, string, error) {
 	opts := options.Find().
 		SetSort(bson.D{{Key: "_id", Value: -1}}).SetLimit(val)
 
 	res, err := mdb.collection.Find(ctx, bson.M{}, opts)
 	if err != nil {
-		return "", err
+		return nil, "", err
 	}
 	defer res.Close(ctx)
 
-	var his []history
+	var his []models.History
 	if err := res.All(ctx, &his); err != nil {
-		return "", err
+		return nil, "", err
 	}
 
 	lenHis := len(his)
@@ -56,7 +38,55 @@ func (mdb *LogsDB) ReadFromChatLogDB(ctx context.Context, val int64) (string, er
 	sb.Grow(lenHis)
 
 	for _, his := range his {
-		sb.WriteString(fmt.Sprintf("Name: %s, Text:%s", his.Name, his.Text))
+		logs := fmt.Sprintf("Name: %s, UID:%d, Text:%s, CID:%d, MID:%d", his.Name, his.UID, his.Text, his.CID, his.MID)
+		sb.WriteString(logs)
 	}
-	return sb.String(), nil
+	return his, sb.String(), nil
+}
+
+func (mdb *LogsDB) DeleteMessage(ctx context.Context, chat_id int64, val int64) error {
+	options := options.Find().
+		SetSort(bson.D{
+			{Key: "mid", Value: -1},
+			{Key: "cid", Value: -1},
+		}).
+		SetLimit(val)
+
+	cursor, err := mdb.collection.Find(ctx, bson.M{
+		"cid": chat_id,
+	}, options)
+
+	if err != nil {
+		return err
+	}
+	defer cursor.Close(ctx)
+
+	var docs []struct {
+		ID any `bson:"_id"`
+	}
+
+	if err = cursor.All(ctx, &docs); err != nil {
+		return err
+	}
+
+	if len(docs) == 0 {
+		return fmt.Errorf("No message to delete")
+	}
+
+	ids := make([]any, len(docs))
+	for i, d := range docs {
+		ids[i] = d.ID
+	}
+
+	_, err = mdb.collection.DeleteMany(ctx, bson.M{
+		"_id": bson.M{
+			"$in": ids,
+		},
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

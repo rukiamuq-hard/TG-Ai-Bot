@@ -6,16 +6,15 @@ import (
 )
 
 type ChatLogRepository interface {
-	StoreToChatLogDB(ctx context.Context, name string, text string) error
-	ReadFromChatLogDB(ctx context.Context, val int64) (string, error)
+	StoreToChatLogDB(ctx context.Context, hist models.History) error
+	ReadFromChatLogDB(ctx context.Context, val int64) ([]models.History, string, error)
+	DeleteMessage(ctx context.Context, chat_id int64, val int64) error
 }
 
 type ContextRepository interface {
 	StoreToContextDB(ctx context.Context, ser_id int64, model string, text string) error
 	ReadFromContextDB(ctx context.Context, ser_id int64) ([]models.Content, error)
 }
-
-//type MongoDB interface {}
 
 type AI interface {
 	GeminiGetResponse(ctx context.Context, istory []models.Content, text string) (string, error)
@@ -25,15 +24,13 @@ type AI interface {
 type Service struct {
 	DBChatLog ChatLogRepository
 	DBContext ContextRepository
-	//	LogsDB MongoDB
-	ai AI
+	ai        AI
 }
 
-func New(DBChatLog ChatLogRepository, DBContext ContextRepository /*LogsDB MongoDB*/, ai AI) *Service {
+func New(DBChatLog ChatLogRepository, DBContext ContextRepository, ai AI) *Service {
 	return &Service{
 		DBChatLog: DBChatLog,
 		DBContext: DBContext,
-		//		LogsDB: LogsDB,
-		ai: ai,
+		ai:        ai,
 	}
 }

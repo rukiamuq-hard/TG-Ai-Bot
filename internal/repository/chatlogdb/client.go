@@ -33,6 +33,13 @@ func (mdb *LogsDB) ConnectDB() error {
 	return nil
 }
 
+func (mdb *LogsDB) PingDB(ctx context.Context) error {
+	if err := mdb.client.Ping(ctx, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (mdb *LogsDB) Close() {
 	mdb.client.Disconnect(context.Background())
 }
