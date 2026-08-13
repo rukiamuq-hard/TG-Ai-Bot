@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"TgAiBot/internal/apperrors"
 	"TgAiBot/internal/models"
 	"context"
 	"fmt"
@@ -48,7 +49,6 @@ func (mdb *LogsDB) DeleteMessage(ctx context.Context, chat_id int64, val int64) 
 	options := options.Find().
 		SetSort(bson.D{
 			{Key: "mid", Value: -1},
-			{Key: "cid", Value: -1},
 		}).
 		SetLimit(val)
 
@@ -70,7 +70,7 @@ func (mdb *LogsDB) DeleteMessage(ctx context.Context, chat_id int64, val int64) 
 	}
 
 	if len(docs) == 0 {
-		return fmt.Errorf("No message to delete")
+		return apperrors.NoMessageToDelete
 	}
 
 	ids := make([]any, len(docs))

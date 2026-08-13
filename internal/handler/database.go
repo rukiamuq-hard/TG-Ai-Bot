@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"TgAiBot/internal/apperrors"
 	"TgAiBot/internal/models"
 	"context"
+	"errors"
 	"log"
 	"strconv"
 	"time"
@@ -43,7 +45,7 @@ func (h *Handler) ClearMessage(c tele.Context) error {
 
 	val, _ := strconv.ParseInt(c.Message().Payload, 10, 64)
 	if val <= 0 {
-		return c.Reply("Incorrect argument")
+		val = 20
 	}
 
 	hist, _, err := h.service.ServiceReadFromChatLogDB(ctx, val)
@@ -61,7 +63,11 @@ func (h *Handler) ClearMessage(c tele.Context) error {
 	}
 
 	if err := h.service.ServiceDeleteFromChatLogDB(ctx, c.Chat().ID, val); err != nil {
-		return c.Reply(err)
+		if errors.Is(err, apperrors.NoMessageToDelete) {
+			return c.Reply(apperrors.NoMessageToDelete.Error())
+		} else {
+			return c.Reply(err)
+		}
 	}
 	return c.Bot().DeleteMany(msgs)
 
