@@ -2,6 +2,11 @@
 
 ![TG-AI-BOT](docs/TgAiBot.svg)
 
+![GitHub repo size](https://img.shields.io/github/repo-size/rukiamuq-hard/TG-Ai-Bot)
+![GitHub language count](https://img.shields.io/github/languages/count/rukiamuq-hard/TG-Ai-Bot)
+![GitHub top language](https://img.shields.io/github/languages/top/rukiamuq-hard/TG-Ai-Bot)
+![GitHub last commit](https://img.shields.io/github/last-commit/rukiamuq-hard/TG-Ai-Bot)
+
 [![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/rukiamuq-hard/TG-Ai-Bot)
 
 </h1>
