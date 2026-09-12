@@ -1,5 +1,7 @@
+<h1 align="center"> THIS BRANCH FOR NON DOCKER ONLY </h1>
+
 <h1 align="center">
-<h1>THIS BRANCH FOR NON DOCKER ONLY</h1>
+  
 ![TG-AI-BOT](docs/TgAiBot.svg)
 
 [![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/rukiamuq-hard/TG-Ai-Bot)
