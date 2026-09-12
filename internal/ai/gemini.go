@@ -26,7 +26,7 @@ func (ai *AI) GeminiGetResponse(ctx context.Context, history []models.Content, t
 		return "", err
 	}
 
-	req, _ := http.NewRequestWithContext(ctx, "POST", url+apiKey, bytes.NewBuffer(body))
+	req, _ := http.NewRequestWithContext(ctx, http.MethodPost, url+apiKey, bytes.NewBuffer(body))
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		fmt.Println(err)

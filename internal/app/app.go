@@ -64,9 +64,9 @@ func (app *App) Start() error {
 
 	b.Handle(tele.OnText, h.StoreMessage)
 
-	b.Handle("/Gemini", h.GeminiGetResp)
+	b.Handle("/Gemini", h.GeminiTextResp)
 
-	b.Handle("/ChatLogs", h.GetHistory)
+	b.Handle("/ChatLogs", h.ChatHistory)
 
 	b.Handle("/Clear", h.ClearMessage)
 

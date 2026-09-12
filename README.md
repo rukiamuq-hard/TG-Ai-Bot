@@ -1,5 +1,5 @@
 <h1 align="center">
-
+<h1>THIS BRANCH FOR NON DOCKER ONLY</h1>
 ![TG-AI-BOT](docs/TgAiBot.svg)
 
 [![Ask DeepWiki](https://devin.ai/assets/askdeepwiki.png)](https://deepwiki.com/rukiamuq-hard/TG-Ai-Bot)
@@ -102,29 +102,14 @@ Create `cmd/.env`:
 ```env
 TOKEN=<YOUR_TELEGRAM_BOT_TOKEN>
 AI_TOKEN=<YOUR_GEMINI_API_KEY>
-MONGO_URI=mongodb://root:root@mongo:27017
+MONGO_URI=mongodb://127.0.0.1@mongo:27017
 ```
 
-3. **Build and start the application**
+3. **Run the application**
 
 ```sh
-make up
-```
-
-Docker Compose will automatically:
-
-- build the image;
-- create the SQLite database if it does not exist;
-- start the bot.
-
-## Useful Make commands
-
-```sh
-make up        # Build and start containers
-make down      # Stop containers
-make restart   # Restart containers
-make logs      # View container logs
-make rebuild   # Rebuild image and restart
+cd cmd
+go run main.go
 ```
 
 ## Usage

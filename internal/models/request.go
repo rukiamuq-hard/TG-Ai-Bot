@@ -6,5 +6,5 @@ type Content struct {
 }
 
 type Part struct {
-	Text string `json:"text"`
+	Text string `json:"text,omitempty"`
 }

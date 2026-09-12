@@ -10,8 +10,8 @@ import (
 	"unicode"
 )
 
-func (h *Handler) GeminiGetResp(c tele.Context) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+func (h *Handler) GeminiTextResp(c tele.Context) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	if c.Args() == nil {
 		return c.Reply("Usage: /Gemini <prompt>")
@@ -36,6 +36,7 @@ func (h *Handler) GeminiGetResp(c tele.Context) error {
 		log.Println("Error: ", err)
 		return c.Reply("Error, try again")
 	}
+
 	err = h.service.ServiceStoreToContextDB(ctx, c.Sender().ID, "model", response)
 	if err != nil {
 		log.Println("Error: ", err)
@@ -44,7 +45,7 @@ func (h *Handler) GeminiGetResp(c tele.Context) error {
 	return c.Reply(response)
 }
 
-func (h *Handler) GetHistory(c tele.Context) error {
+func (h *Handler) ChatHistory(c tele.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second) // ai context time need to be 10 or 10+ seconds
 	defer cancel()
 	for _, s := range c.Message().Payload {

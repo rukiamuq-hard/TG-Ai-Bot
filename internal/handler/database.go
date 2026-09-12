@@ -5,6 +5,7 @@ import (
 	"TgAiBot/internal/models"
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -30,6 +31,7 @@ func (h *Handler) StoreMessage(c tele.Context) error {
 		log.Println("failed store to chat log db")
 		return err
 	}
+	fmt.Printf("Name:%s Text:%s UID:%d CID:%d MID:%d\n", hist.Name, hist.Text, hist.UID, hist.CID, hist.MID)
 	return nil
 }
 
